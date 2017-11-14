@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head >
+	<title>Biblioteca</title>
+</h:head>
+<h:body>
+	<div id="titulo">
+	<h:graphicImage library="img" name="livro.png" /> 
+	
+	<h:outputText value="#{sessionScope['usuarioLogado'].nome}" />
+	
+	<p:growl id="messages" showDetail="true" autoUpdate="true" />
+		
+		<h:form rendered="#{usuarioLogado != null}">  
+    <p:growl id="messages"/>
+ 		 
+    <p:menubar>
+    	<p:menuitem value="Home" action="home?faces-redirect=true" icon="ui-icon-home"/>
+
+        <p:submenu label="Livro" icon="ui-icon-extlink">
+            <p:menuitem value="Autores" action="autor?faces-redirect=true" icon="ui-icon-extlink"/>
+            <p:menuitem value="Categorias" action="categoria?faces-redirect=true" icon="ui-icon-extlink"/>
+            <p:menuitem value="Livros" action="livro?faces-redirect=true" icon="ui-icon-extlink"/>
+        </p:submenu>
+ 
+        <p:submenu label="Pessoas" icon="ui-icon-extlink">
+            <p:menuitem value="Clientes" action="cliente?faces-redirect=true" icon="ui-icon-extlink" />
+            <p:menuitem value="Usuários" action="usuario?faces-redirect=true" icon="ui-icon-extlink" />
+        </p:submenu>
+ 
+        <p:submenu label="Aluguel" icon="ui-icon-extlink">
+            <p:menuitem value="Aluguel de Livros" action="aluguel?faces-redirect=true" icon="ui-icon-extlink"/>
+        </p:submenu>
+        
+ 
+        <f:facet name="options">
+            <p:commandButton value="Logout" action="#{usuarioBean.logout()}" icon="ui-icon-extlink" />
+        </f:facet>
+    </p:menubar>
+    
+    
+</h:form>
+		<h1>
+			<ui:insert name="titulo"></ui:insert>
+		</h1>
+
+
+	</div>
+	<div id="conteudo">
+		<ui:insert name="conteudo">
+		</ui:insert>
+	</div>
+	<div id="rodape">
+		&copy; Copyright 2017 - 2º BCC João Victor Viel
+		<ui:insert name="texto">
+		</ui:insert>
+	</div>
+</h:body>
+</html>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<ui:composition template="_template.xhtml">
+
+	<ui:define name="titulo">
+		<p:outputPanel>Login</p:outputPanel>
+	</ui:define>
+	<ui:define name="conteudo">
+		<p:messages id="usuario" />
+
+		<p:growl id="mensagem" />
+
+		<h:form>
+			<p:fieldset legend="Login">
+
+				<h:panelGrid columns="2" cellpadding="10">
+					<p:outputLabel value="CPF:" for="cpf" />
+					<p:inputMask id="cpf" value="#{usuarioBean.usuario.cpf}"
+						required="true" requiredMessage="CPF obrigatório" placeholder="Login" mask="999.999.999-99">
+						<f:passThroughAttribute name="type" value="cpf" />
+						<p:message for="cpf" id="messageEmail" />
+					</p:inputMask>
+					
+
+					<p:outputLabel value="Senha: " for="senha" />
+					<p:password id="senha" value="#{usuarioBean.usuario.senha}"
+						feedback="true" required="true"
+						requiredMessage="Senha obrigatória" placeholder="Senha" >
+					<p:message for="senha" id="messageSenha" />
+					</p:password>
+					
+					<p:commandButton value="Entrar" action="#{usuarioBean.logar}"
+						update=":mensagem" />
+				</h:panelGrid>
+			</p:fieldset>
+		</h:form>
+	</ui:define>
+</ui:composition>
+</html>

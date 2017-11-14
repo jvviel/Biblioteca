@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui">
+
+<ui:composition template="_template.xhtml">
+
+	<ui:define name="titulo">
+		<p:outputPanel>Livros</p:outputPanel>
+	</ui:define>
+	<ui:define name="conteudo">
+
+<p:growl id="mensagem" />
+
+	<h:form id="formListagem">
+	<p:panel header="Livros - Listagem">
+		<p:dataTable id="tabela" emptyMessage="Nenhum registro encontrado." paginator="true"
+		value="#{livroBean.listarLivro()}" var="livro" rows="5">
+	
+			<f:facet name="header">
+			<p:commandButton value="Novo" oncomplete="PF('dialogo').show();" actionListener="#{livroBean.novo()}"
+			update=":formCadastro:painel"/>
+			</f:facet>
+		
+			<p:column headerText="Código" sortBy="#{livro.id}" filterBy="#{livro.id}">
+				<h:outputText value="#{livro.id}" />
+			</p:column>
+		
+			<p:column headerText="Livro" sortBy="#{livro.livro}" filterBy="#{livro.livro}">
+				<h:outputText value="#{livro.livro}" />
+			</p:column>
+			
+			<p:column headerText="Status" sortBy="#{livro.status.status}" filterBy="#{livro.status.status}">
+				<h:outputText value="#{livro.status.status}" />
+			</p:column>
+			
+			<p:column headerText="Autor" sortBy="#{livro.autor.nome}" filterBy="#{livro.autor.nome}">
+				<h:outputText value="#{livro.autor.nome}" />
+			</p:column>
+			
+			<p:column headerText="Categoria" sortBy="#{livro.categoria.descricao}" filterBy="#{livro.categoria.descricao}">
+				<h:outputText value="#{livro.categoria.descricao}" />
+			</p:column>
+		
+			<p:column headerText="Opções">
+				<p:commandButton icon="ui-icon-trash" actionListener="#{livroBean.excluir(livro)}" update=":mensagem :formListagem:tabela">
+					<p:confirm header="Confirmação" message="Deseja excluir o livro?" icon="ui-icon-alert" />
+				</p:commandButton>
+				
+				<p:commandButton icon="ui-icon-pencil" actionListener="#{livroBean.selecionaLivro}" 
+				update=":formEditar:painelEditar"
+				oncomplete="PF('dialogoEditar').show();">
+					<f:attribute name="livroSelecionado" value="#{livro}" />
+				</p:commandButton>
+			</p:column>
+		
+		</p:dataTable>
+		
+		<p:confirmDialog global="true">
+			<p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+			<p:commandButton value="Não" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+		</p:confirmDialog>
+	</p:panel>
+	</h:form>
+	
+	<p:dialog header="Livros - Cadastros" widgetVar="dialogo" draggable="false" resizable="false" modal="true"
+	closable="false">
+	
+		<h:form id="formCadastro">
+			<p:fieldset legend="Livro">
+			<h:panelGrid id="painel" columns="2">
+			<p:outputLabel value="Livro: *"/>
+			<p:inputText maxlength="50" size="25" value="#{livroBean.livro.livro}" required="true" 
+			requiredMessage="Nome é obrigatorio" />
+			
+			<p:outputLabel value="Status: *"/>
+			<p:selectOneMenu filter="true" value="#{livroBean.idStatus}">
+				<f:selectItem itemValue="" itemLabel="Selecione um Status"/>
+				<f:selectItems value="#{livroBean.listarStatus()}" var="status" itemValue="#{status.id}"
+				itemLabel="#{status.status}" />
+			</p:selectOneMenu>
+			
+			<p:outputLabel value="Autor: *"/>
+			<p:selectOneMenu filter="true" value="#{livroBean.idAutor}">
+				<f:selectItem itemValue="" itemLabel="Selecione um Autor"/>
+				<f:selectItems value="#{livroBean.listarAutores()}" var="autor" itemValue="#{autor.id}"
+				itemLabel="#{autor.nome}" />
+			</p:selectOneMenu>
+			
+			<p:outputLabel value="Categoria: *"/>
+			<p:selectOneMenu filter="true" value="#{livroBean.idCategoria}">
+				<f:selectItem itemValue="" itemLabel="Selecione uma Categoria"/>
+				<f:selectItems value="#{livroBean.listarCategorias()}" var="categoria" itemValue="#{categoria.id}"
+				itemLabel="#{categoria.descricao}" />
+			</p:selectOneMenu>
+			
+			
+			</h:panelGrid>
+			</p:fieldset>
+			<h:panelGrid columns="2">
+			<p:commandButton value="Salvar" actionListener="#{livroBean.salvarLivro()}" 
+			update=":mensagem :formCadastro:painel :formListagem:tabela" onclick="PF('dialogo').hide();"/>
+			<p:commandButton value="Fechar" onclick="PF('dialogo').hide();"/>
+			</h:panelGrid>
+			
+			
+		</h:form>
+	</p:dialog>
+	
+	<p:dialog header="Autor - Editar" widgetVar="dialogoEditar" draggable="false" resizable="false" modal="true"
+	closable="false">
+	
+		<h:form id="formEditar">
+			<p:fieldset legend="Livro">
+			<h:panelGrid id="painelEditar" columns="2">
+			
+			<p:outputLabel value="Livro: *"/>
+			<p:inputText maxlength="50" size="25" value="#{livroBean.livro.livro}" required="true" 
+			requiredMessage="Nome é obrigatorio" />
+			
+			<p:outputLabel value="Status: *"/>
+			<p:selectOneMenu filter="true" value="#{livroBean.idStatus}">
+				<f:selectItem itemValue="" itemLabel="Selecione um Status"/>
+				<f:selectItems value="#{livroBean.listarStatus()}" var="status" itemValue="#{status.id}"
+				itemLabel="#{status.status}" />
+			</p:selectOneMenu>
+			
+			<p:outputLabel value="Autor: *"/>
+			<p:selectOneMenu filter="true" value="#{livroBean.idAutor}">
+				<f:selectItem itemValue="" itemLabel="Selecione um Autor"/>
+				<f:selectItems value="#{livroBean.listarAutores()}" var="autor" itemValue="#{autor.id}"
+				itemLabel="#{autor.nome}" />
+			</p:selectOneMenu>
+			
+			<p:outputLabel value="Categoria: *"/>
+			<p:selectOneMenu filter="true" value="#{livroBean.idCategoria}">
+				<f:selectItem itemValue="" itemLabel="Selecione uma Categoria"/>
+				<f:selectItems value="#{livroBean.listarCategorias()}" var="categoria" itemValue="#{categoria.id}"
+				itemLabel="#{categoria.descricao}" />
+			</p:selectOneMenu>
+			
+			</h:panelGrid>
+			</p:fieldset>
+			
+			<h:panelGrid columns="2">
+			<p:commandButton value="Editar" actionListener="#{livroBean.editarLivro()}" 
+			update=":mensagem :formEditar:painelEditar :formListagem:tabela" onclick="PF('dialogoEditar').hide();"/>
+			<p:commandButton value="Fechar" onclick="PF('dialogoEditar').hide();"/>
+			</h:panelGrid>
+			
+		</h:form>
+	</p:dialog>
+	
+
+</ui:define>
+</ui:composition>
+
+</html>

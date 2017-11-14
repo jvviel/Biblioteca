@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui">
+
+<ui:composition template="_template.xhtml">
+
+	<ui:define name="titulo">
+		<p:outputPanel>Aluguel</p:outputPanel>
+	</ui:define>
+	<ui:define name="conteudo">
+
+<p:growl id="mensagem" />
+
+	<h:form id="formListagem">
+	<h:messages /> 
+	<p:panel header="Aluguel - Listagem">
+		<p:dataTable id="tabela" emptyMessage="Nenhum registro encontrado." paginator="true"
+		value="#{aluguelBean.listarAluguel()}" var="aluguel" rows="5">
+	
+			<f:facet name="header">
+			<p:commandButton value="Novo" oncomplete="PF('dialogo').show();" actionListener="#{aluguelBean.novo()}"
+			update=":formCadastro:painel"/>
+			</f:facet>
+		
+			<p:column headerText="Código" sortBy="#{aluguel.id}" filterBy="#{aluguel.id}">
+				<h:outputText value="#{aluguel.id}" />
+			</p:column>
+		
+			<p:column headerText="Livro" sortBy="#{aluguel.livros.livro}" filterBy="#{aluguel.livros.livro}">
+				<h:outputText value="#{aluguel.livros.livro}" />
+			</p:column>
+			
+			<p:column headerText="Cliente" sortBy="#{aluguel.cliente.nome}" filterBy="#{aluguel.cliente.nome}">
+				<h:outputText value="#{aluguel.cliente.nome}" />
+			</p:column>
+			
+			<p:column headerText="Data Aluguel" sortBy="#{aluguel.dataAluguel.time}" filterBy="#{aluguel.dataAluguel.time}">
+                <h:outputText value="#{aluguel.dataAluguel.time}" >
+            <f:convertDateTime pattern="dd/MM/yyyy"/>
+        	</h:outputText>
+            </p:column>
+
+            <p:column headerText="Data Devolução" sortBy="#{aluguel.dataDevolucao.time}" filterBy="#{aluguel.dataDevolucao.time}">
+                <h:outputText value="#{aluguel.dataDevolucao.time}" >
+            <f:convertDateTime pattern="dd/MM/yyyy"/>
+                </h:outputText>    
+            </p:column>
+		
+			<p:column headerText="Opções">
+				<p:commandButton value="Finalizar" actionListener="#{aluguelBean.excluirAluguel(aluguel)}" 
+				update=":mensagem :formListagem:tabela">
+					<p:confirm header="Confirmação" message="Deseja finalizar o aluguel?" icon="ui-icon-alert" />
+				</p:commandButton>
+				
+				<p:commandButton value="Renovar" actionListener="#{aluguelBean.selecionaAluguel}" 
+				update=":formEditar:painelEditar"
+				oncomplete="PF('dialogoEditar').show();">
+					<f:attribute name="aluguelSelecionado" value="#{aluguel}" />
+				</p:commandButton>
+			</p:column>
+		
+		</p:dataTable>
+		
+		<p:confirmDialog global="true">
+			<p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+			<p:commandButton value="Não" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+		</p:confirmDialog>
+	</p:panel>
+	</h:form>
+	
+	<p:dialog header="Livros - Cadastros" widgetVar="dialogo" draggable="false" resizable="false" modal="true"
+	closable="false">
+	
+		<h:form id="formCadastro">
+			<p:fieldset legend="Aluguel">
+			<h:panelGrid id="painel" columns="2">
+			<p:outputLabel value="Livro: *"/>
+			<p:selectOneMenu filter="true" value="#{aluguelBean.idLivro}">
+				<f:selectItem itemValue="" itemLabel="Selecione um Livro"/>
+				<f:selectItems value="#{aluguelBean.listarLivros()}" var="livro" itemValue="#{livro.id}"
+				itemLabel="#{livro.livro}" />
+			</p:selectOneMenu>
+			
+			<p:outputLabel value="Cliente: *"/>
+			<p:selectOneMenu filter="true" value="#{aluguelBean.idCliente}">
+				<f:selectItem itemValue="" itemLabel="Selecione um Cliente"/>
+				<f:selectItems value="#{aluguelBean.listarClientes()}" var="cliente" itemValue="#{cliente.id}"
+				itemLabel="#{cliente.nome}" />
+			</p:selectOneMenu>
+			
+			<h:outputText value="Data Aluguel:" />
+            <p:inputMask value="#{aluguelBean.aluguel.dataAluguel.time}" mask="99/99/9999">
+                <f:convertDateTime pattern="dd/MM/yyyy" timeZone="America/Sao_Paulo"/>
+            </p:inputMask>
+            
+           <h:outputText value="Data Devolução:" />
+            <p:inputMask  value="#{aluguelBean.aluguel.dataDevolucao.time}" mask="99/99/9999">
+                <f:convertDateTime pattern="dd/MM/yyyy" timeZone="America/Sao_Paulo"/>
+            </p:inputMask>
+			
+			</h:panelGrid>
+			</p:fieldset>
+			<h:panelGrid columns="2">
+			<p:commandButton value="Salvar" actionListener="#{aluguelBean.salvarAluguel()}" 
+			update=":mensagem :formCadastro:painel :formListagem:tabela" onclick="PF('dialogo').hide();"/>
+			<p:commandButton value="Fechar" onclick="PF('dialogo').hide();"/>
+			</h:panelGrid>
+			
+			
+		</h:form>
+	</p:dialog>
+	
+	<p:dialog header="Autor - Editar" widgetVar="dialogoEditar" draggable="false" resizable="false" modal="true"
+	closable="false">
+	
+		<h:form id="formEditar">
+			<p:fieldset legend="Livro">
+			<h:panelGrid id="painelEditar" columns="2">
+			
+			<p:outputLabel value="Livro: *"/>
+			<p:selectOneMenu filter="true" value="#{aluguelBean.idLivro}">
+				<f:selectItem itemValue="" itemLabel="Selecione um Livro"/>
+				<f:selectItems value="#{aluguelBean.listarLivros()}" var="livro" itemValue="#{livro.id}"
+				itemLabel="#{livro.livro}" />
+			</p:selectOneMenu>
+			
+			<p:outputLabel value="Cliente: *"/>
+			<p:selectOneMenu filter="true" value="#{aluguelBean.idCliente}">
+				<f:selectItem itemValue="" itemLabel="Selecione um Cliente"/>
+				<f:selectItems value="#{aluguelBean.listarClientes()}" var="cliente" itemValue="#{cliente.id}"
+				itemLabel="#{cliente.nome}" />
+			</p:selectOneMenu>
+			
+			<h:outputText value="Data Aluguel:" />
+            <p:inputMask value="#{aluguelBean.aluguel.dataAluguel.time}" mask="99/99/9999">
+                <f:convertDateTime pattern="dd/MM/yyyy" timeZone="America/Sao_Paulo"/>
+            </p:inputMask>
+            
+           <h:outputText value="Data Devolução:" />
+            <p:inputMask  value="#{aluguelBean.aluguel.dataAluguel.time}" mask="99/99/9999">
+                <f:convertDateTime pattern="dd/MM/yyyy" timeZone="America/Sao_Paulo"/>
+            </p:inputMask>
+			
+			</h:panelGrid>
+			</p:fieldset>
+			
+			<h:panelGrid columns="2">
+			<p:commandButton value="Editar" actionListener="#{aluguelBean.editarAluguel()}" 
+			update=":mensagem :formEditar:painelEditar :formListagem:tabela" onclick="PF('dialogoEditar').hide();"/>
+			<p:commandButton value="Fechar" onclick="PF('dialogoEditar').hide();"/>
+			</h:panelGrid>
+			
+		</h:form>
+	</p:dialog>
+	
+
+</ui:define>
+</ui:composition>
+
+</html>

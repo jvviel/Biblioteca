@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui">
+
+<ui:composition template="_template.xhtml">
+
+	<ui:define name="titulo">
+		<p:outputPanel>Autores</p:outputPanel>
+	</ui:define>
+	<ui:define name="conteudo">
+
+<p:growl id="mensagem" />
+
+	<h:form id="formListagem">
+	<p:panel header="Autores - Listagem">
+		<p:dataTable id="tabela" emptyMessage="Nenhum registro encontrado." paginator="true"
+		value="#{autorBean.listarAutores()}" var="autor" rows="5">
+	
+			<f:facet name="header">
+			<p:commandButton value="Novo" oncomplete="PF('dialogo').show();" actionListener="#{autorBean.novo()}"
+			update=":formCadastro:painel"/>
+			</f:facet>
+		
+			<p:column headerText="Código" sortBy="#{autor.id}" filterBy="#{autor.id}">
+				<h:outputText value="#{autor.id}" />
+			</p:column>
+		
+			<p:column headerText="Nome" sortBy="#{autor.nome}" filterBy="#{autor.nome}">
+				<h:outputText value="#{autor.nome}" />
+			</p:column>
+		
+			<p:column headerText="Opções">
+				<p:commandButton icon="ui-icon-trash" actionListener="#{autorBean.excluirAutor(autor)}" update=":mensagem :formListagem:tabela">
+					<p:confirm header="Confirmação" message="Deseja excluir o autor?" icon="ui-icon-alert" />
+				</p:commandButton>
+				
+				<p:commandButton icon="ui-icon-pencil" actionListener="#{autorBean.selecionaAutor}" 
+				update=":formEditar:painelEditar"
+				oncomplete="PF('dialogoEditar').show();">
+					<f:attribute name="autorSelecionado" value="#{autor}" />
+				</p:commandButton>
+			</p:column>
+		
+		</p:dataTable>
+		
+		<p:confirmDialog global="true">
+			<p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+			<p:commandButton value="Não" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+		</p:confirmDialog>
+	</p:panel>
+	</h:form>
+	
+	<p:dialog header="Autor - Cadastros" widgetVar="dialogo" draggable="false" resizable="false" modal="true"
+	closable="false">
+	
+		<h:form id="formCadastro">
+			<p:fieldset legend="Autor">
+			<h:panelGrid id="painel" columns="2">
+			<p:outputLabel value="Nome: *"/>
+			<p:inputText maxlength="50" size="30" value="#{autorBean.autor.nome}" required="true" requiredMessage="Nome é obrigatorio" />
+			</h:panelGrid>
+			</p:fieldset>
+			<h:panelGrid columns="2">
+			<p:commandButton value="Salvar" actionListener="#{autorBean.salvarAutor()}" 
+			update=":mensagem :formCadastro:painel :formListagem:tabela" onclick="PF('dialogo').hide();"/>
+			<p:commandButton value="Fechar" onclick="PF('dialogo').hide();"/>
+			</h:panelGrid>
+			
+			
+		</h:form>
+	</p:dialog>
+	
+	<p:dialog header="Autor - Editar" widgetVar="dialogoEditar" draggable="false" resizable="false" modal="true"
+	closable="false">
+	
+		<h:form id="formEditar">
+			<p:fieldset legend="Autor">
+			<h:panelGrid id="painelEditar" columns="2">
+			<p:outputLabel value="Nome: *"/>
+			<p:inputText maxlength="50" size="30" value="#{autorBean.autor.nome}" required="true" requiredMessage="Nome é obrigatorio" />
+			</h:panelGrid>
+			</p:fieldset>
+			
+			<h:panelGrid columns="2">
+			<p:commandButton value="Editar" actionListener="#{autorBean.editarAutor}" 
+			update=":mensagem :formEditar:painelEditar :formListagem:tabela" onclick="PF('dialogoEditar').hide();"/>
+			<p:commandButton value="Fechar" onclick="PF('dialogoEditar').hide();"/>
+			</h:panelGrid>
+			
+		</h:form>
+	</p:dialog>
+	
+
+</ui:define>
+</ui:composition>
+
+</html>
